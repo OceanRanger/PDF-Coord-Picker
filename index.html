@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF 坐标拾取工具</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- 左侧边栏 -->
+        <div class="sidebar">
+            <h1>PDF 坐标拾取工具</h1>
+
+            <!-- 文件上传 -->
+            <div class="upload-section">
+                <label for="fileInput" class="file-label">
+                    <span>选择 PDF 文件</span>
+                </label>
+                <input type="file" id="fileInput" accept=".pdf">
+                <div id="fileName" class="file-name"></div>
+            </div>
+
+            <!-- 自由绘制 -->
+            <div class="action-section">
+                <button id="drawRectBtn" class="btn-action">自由绘制</button>
+            </div>
+
+            <!-- 页面导航 -->
+            <div class="page-nav">
+                <button id="prevPage" disabled>上一页</button>
+                <span id="pageInfo">第 1 页</span>
+                <button id="nextPage" disabled>下一页</button>
+            </div>
+
+            <!-- 缩放控制 -->
+            <div class="zoom-controls">
+                <input type="range" id="zoomSlider" class="zoom-slider" min="50" max="300" step="10" value="200">
+            </div>
+            <div class="zoom-controls-row">
+                <input type="number" id="zoomLevel" class="zoom-input" value="200" min="50" max="300" step="10">
+                <span class="zoom-percent">%</span>
+                <button id="zoomFit" class="btn-zoom-fit">适应页面</button>
+            </div>
+
+            <!-- 文字输入 -->
+            <div class="text-input-section">
+                <h3>添加矩形</h3>
+                <div class="input-group">
+                    <label>标签（方便识别，不画在PDF上）：</label>
+                    <input type="text" id="fieldLabel" placeholder="例如：Filer Code">
+                </div>
+                <div class="input-group">
+                    <label>文字内容（画在PDF上）：</label>
+                    <input type="text" id="fieldText" placeholder="例如：ABC123">
+                </div>
+                <div class="input-group">
+                    <label>字体大小：</label>
+                    <select id="fontSize">
+                        <option value="8">8pt</option>
+                        <option value="10" selected>10pt</option>
+                        <option value="12">12pt</option>
+                        <option value="14">14pt</option>
+                        <option value="16">16pt</option>
+                    </select>
+                </div>
+                <button id="addRectBtn" class="btn-primary">添加矩形</button>
+            </div>
+
+            <!-- 坐标列表 -->
+            <div class="coords-section">
+                <div class="coords-header">
+                    <h3>坐标列表</h3>
+                    <button id="copyAllBtn" class="btn-copy-small">复制所有坐标</button>
+                </div>
+                <div id="coordinateList">
+                    <p class="empty-hint">暂无坐标数据</p>
+                </div>
+            </div>
+
+            <!-- 清空按钮 -->
+            <div class="clear-section">
+                <button id="clearAllBtn" class="btn-danger">清空所有矩形</button>
+            </div>
+        </div>
+
+        <!-- 右侧画布区域 -->
+        <div class="canvas-container">
+            <!-- 空状态占位符 -->
+            <div id="emptyState" class="empty-state">
+                <div class="empty-icon">📄</div>
+                <h2>请上传 PDF 文件</h2>
+                <p>点击左侧"选择 PDF 文件"按钮开始使用</p>
+                <p class="empty-hint-detail">支持任意 PDF 格式的模板文件</p>
+            </div>
+            <div class="canvas-wrapper">
+                <canvas id="pdfCanvas"></canvas>
+                <div id="selectionBox"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 鼠标坐标显示 -->
+    <div id="mouseCoords" class="mouse-coords">
+        X: <span id="coordX">0.00</span>
+        Y: <span id="coordY">0.00</span>
+    </div>
+
+    <!-- 矩形信息弹窗 -->
+    <div id="rectModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>输入矩形信息</h3>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="input-group">
+                    <label>标签名称：</label>
+                    <input type="text" id="modalLabel" placeholder="例如：Filer Code">
+                </div>
+                <div class="input-group">
+                    <label>显示文字（可选）：</label>
+                    <input type="text" id="modalText" placeholder="画在PDF上的文字">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="modalCancel" class="btn-secondary">取消</button>
+                <button id="modalConfirm" class="btn-primary">确定</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast 提示容器 -->
+    <div id="toastContainer"></div>
+
+    <!-- 确认对话框 -->
+    <div id="confirmDialog" class="modal">
+        <div class="modal-content modal-small">
+            <div class="modal-header">
+                <h3 id="confirmTitle">确认操作</h3>
+                <span class="close" onclick="closeConfirm()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p id="confirmMessage" class="confirm-message"></p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeConfirm()">取消</button>
+                <button class="btn-primary btn-danger" id="confirmOkBtn">确定</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PDF.js 库 -->
+    <script src="js/pdf.min.js"></script>
+    <!-- 应用逻辑 -->
+    <script src="js/app.js"></script>
+</body>
+</html>
